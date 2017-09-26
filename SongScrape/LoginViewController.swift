@@ -13,9 +13,6 @@ import SpotifyLogin
 
 class LoginViewController: UIViewController, MPMediaPickerControllerDelegate {
     
-    var auth = SPTAuth.defaultInstance()!
-    var session:SPTSession!
-    var player: SPTAudioStreamingController?
     var loginUrl: URL?
     let searchUrlBase = "https://api.spotify.com/v1/search?q="
     var thisStorefrontId:String?
@@ -234,13 +231,4 @@ class LoginViewController: UIViewController, MPMediaPickerControllerDelegate {
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
-    /*
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        guard let dest = segue.destination as? PlayerTableViewController else { return }
-        if servicesUpdated {
-            //dest.spotifySession = self.session
-            dest.thisStorefrontId = self.thisStorefrontId
-        }
-    } */
-
 }

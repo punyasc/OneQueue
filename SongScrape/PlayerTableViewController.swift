@@ -65,7 +65,7 @@ class PlayerTableViewController: UITableViewController, SPTAudioStreamingPlaybac
     }
     var lastSong:Song?
     var thisStorefrontId:String?
-    var applicationMusicPlayer = MPMusicPlayerController.applicationMusicPlayer
+    var applicationMusicPlayer = MPMusicPlayerController.systemMusicPlayer
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)

@@ -242,7 +242,9 @@ class QueueSongViewController: UIViewController, UITableViewDelegate, UITableVie
     }
     
     func addSongAndReturn(songToSend: Song) {
+        self.indicator.isHidden = false
         self.indicator.startAnimating()
+        
         if let data = NSData(contentsOf: URL(string: songToSend.hdImageUrl!)!) {
             let artwork = UIImage(data: data as Data)
             songToSend.artwork = artwork
@@ -250,6 +252,7 @@ class QueueSongViewController: UIViewController, UITableViewDelegate, UITableVie
             print("Could not get high resolution image")
         }
         self.indicator.stopAnimating()
+        self.indicator.isHidden = true
         if let presenter = presentingViewController as? PlayerTableViewController {
             presenter.queue.append(songToSend)
         }
