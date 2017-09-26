@@ -7,40 +7,22 @@
 //
 
 import UIKit
-import SpotifyLogin
 
 class WelcomeViewController: UIViewController {
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        SpotifyLogin.shared.getAccessToken { (accessToken, error) in
-            if error != nil {
-                print("WelcomeVC: User is not logged in to Spotify. Log in.")
-                // User is not logged in, show log in flow.
-            } else {
-                print("WelcomeVC: User is logged in to Spotify with token \(accessToken)")
-            }
-        }
-        
-        //Uncomment this once done testing the new Spotify login API
-        /*
         if UserDefaults.standard.bool(forKey: "UserServicesSet") {
             performSegue(withIdentifier: "BypassLogin", sender: self)
             print("yah")
         } else {
             print("nah")
-        } */
+        }
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        let button = SpotifyLoginButton(viewController: self, scopes: [.streaming])
-        self.view.addSubview(button)
-        
-        
-        NotificationCenter.default.addObserver(self, selector: #selector(loginSuccessful), name: .SpotifyLoginSuccessful, object: nil)
-        
         /*
         let userLoginStatus = UserDefaults.standard.bool(forKey: "isUserLoggedIn")
         if userLoginStatus
@@ -57,17 +39,6 @@ class WelcomeViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
-    @objc func loginSuccessful() {
-        print("WelcomeVC: Spotify Login successful!")
-        SpotifyLogin.shared.getAccessToken { (accessToken, error) in
-            if error == nil {
-                print("WelcomeVC: Access token is \(accessToken)")
-            } else {
-                print("error: \(error)")
-            }
-        }
-    }
-    
     @IBAction func unwindToWelcome(unwindSegue: UIStoryboardSegue) { }
 
     
@@ -75,6 +46,7 @@ class WelcomeViewController: UIViewController {
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        /*
         if let dest = segue.destination as? PlayerTableViewController {
             if let sessionObj:AnyObject = UserDefaults.standard.object(forKey: "SpotifySession") as AnyObject? {
                 let sessionDataObj = sessionObj as! Data
@@ -91,7 +63,11 @@ class WelcomeViewController: UIViewController {
                 dest.cameFromWelcomeScreen = true
         } else {
             print("Was not a Player Table View Controller nor a Login View Controller")
-        }
+        } */
+        
+        guard let destNav = segue.destination as? UINavigationController else { return }
+        guard let dest = destNav.viewControllers[0] as? LoginViewController else { return }
+        dest.backButton.isEnabled = true
     }
 
 }

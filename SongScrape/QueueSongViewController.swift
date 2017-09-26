@@ -163,8 +163,8 @@ class QueueSongViewController: UIViewController, UITableViewDelegate, UITableVie
         Alamofire.request(url).responseJSON(completionHandler: { response in
             //print("JSON response:")
             let j = JSON(data: response.data!)
-            //print("Apple data:")
-            //print(j)
+            print("QueueSongVC: Apple//")
+            print(j)
             
             let items = j["results"].arrayValue
             for item in items {
@@ -174,14 +174,14 @@ class QueueSongViewController: UIViewController, UITableViewDelegate, UITableVie
                 let trackId = item["trackId"].stringValue
                 let artworkUrl = item["artworkUrl100"].stringValue
                 let newArtworkUrl = artworkUrl.replacingOccurrences(of: "/100x100bb.jpg", with: "/300x300bb.jpg")
-                //print("ATWORK URL: \(newArtworkUrl)")
-                
+                let hdImageUrl = artworkUrl.replacingOccurrences(of: "/100x100bb.jpg", with: "/640x640bb.jpg")
+                let duration = item["trackTimeMillis"].doubleValue
                 guard let data = NSData(contentsOf: URL(string: newArtworkUrl)!)  else {
                     //print("Could not get data")
                     return
                 }
                 let artwork = UIImage(data: data as Data)
-                let thisSong = Song(title: songTitle, artist: artist, album: album,  artwork: artwork, service: .applemusic, spotifyUri: nil, startTime: 0, appleId: trackId)
+                let thisSong = Song(title: songTitle, artist: artist, album: album,  artwork: artwork, service: .applemusic, spotifyUri: nil, duration: duration, appleId: trackId, hdImageUrl: hdImageUrl)
                 self.appleSongs.append(thisSong)
                 //self.resultsTableView.reloadData()
             }
@@ -195,40 +195,31 @@ class QueueSongViewController: UIViewController, UITableViewDelegate, UITableVie
     }
     
     func callSpotify(url: String, token: String) {
-        /*
-        guard let token = UserDefaults.standard.string(forKey: "SpotifyToken") else {
-            print("Could not fetch Spotify token for search")
-            return
-        }*/
-        
         let headers: HTTPHeaders = [
             "Authorization": "Bearer \(token)",
             "Accept": "application/json"
         ]
-        //print("spotify url:///")
         
         Alamofire.request(url, headers: headers).responseJSON(completionHandler: { response in
-            //print("JSON response:")
             
             let j = JSON(data: response.data!)
-            //print(j)
+            print("QueueSongVC: Spotify//")
+            print(j)
             let items = j["tracks"]["items"].arrayValue
-            //print("count items:")
             for item in items {
                 let songTitle = item["name"].stringValue
                 let artist = item["artists"][0]["name"].stringValue
                 let album = item["album"]["name"].stringValue
                 let uri = item["uri"].stringValue
                 let artworkUrl = item["album"]["images"][1]["url"].stringValue
-                //print("ARTOWKR URL: \(artworkUrl)")
+                let duration = item["duration_ms"].doubleValue
                 let data = NSData(contentsOf: URL(string: artworkUrl)!)
                 let artwork = UIImage(data: data as! Data)
-                let thisSong = Song(title: songTitle, artist: artist, album: album, artwork: artwork, service: .spotify, spotifyUri: uri, startTime: 0, appleId: nil)
+                let hdImageUrl = item["album"]["images"][0]["url"].stringValue
+                let thisSong = Song(title: songTitle, artist: artist, album: album, artwork: artwork, service: .spotify, spotifyUri: uri, duration: duration, appleId: nil, hdImageUrl: hdImageUrl)
                 self.spotifySongs.append(thisSong)
                 self.names.append(item["name"].stringValue)
-                //self.resultsTableView.reloadData()
             }
-            //print(self.names)
             self.spotifyDoneLoading = true
             self.updateActivityIndicator()
             self.resultsTableView.reloadData()
@@ -251,11 +242,18 @@ class QueueSongViewController: UIViewController, UITableViewDelegate, UITableVie
     }
     
     func addSongAndReturn(songToSend: Song) {
+        self.indicator.startAnimating()
+        if let data = NSData(contentsOf: URL(string: songToSend.hdImageUrl!)!) {
+            let artwork = UIImage(data: data as Data)
+            songToSend.artwork = artwork
+        } else {
+            print("Could not get high resolution image")
+        }
+        self.indicator.stopAnimating()
         if let presenter = presentingViewController as? PlayerTableViewController {
             presenter.queue.append(songToSend)
         }
         dismiss(animated: true, completion: nil)
-        //performSegue(withIdentifier: "SongAdded", sender: nil)
     }
     
     /* KEYBOARD DISMISSAL */
@@ -295,16 +293,5 @@ class QueueSongViewController: UIViewController, UITableViewDelegate, UITableVie
         resultsTableView.scrollIndicatorInsets = contentInsets
     }
 
-    
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
 
 }

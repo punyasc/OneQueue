@@ -20,11 +20,11 @@ class LoginViewController: UIViewController, MPMediaPickerControllerDelegate {
     let searchUrlBase = "https://api.spotify.com/v1/search?q="
     var thisStorefrontId:String?
     var servicesUpdated = false
-    var cameFromWelcomeScreen = true
+    //var cameFromWelcomeScreen = true
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        backButton.isEnabled = cameFromWelcomeScreen
+        //backButton.isEnabled = cameFromWelcomeScreen
         servicesUpdated = false
         if UserDefaults.standard.bool(forKey: "SpotifyEnabled") {
             updateUISpotifyEnabled()
@@ -53,17 +53,6 @@ class LoginViewController: UIViewController, MPMediaPickerControllerDelegate {
     
     @IBAction func unwindToLogin(unwindSegue: UIStoryboardSegue) { }
     
-    func spotifyConnectionInit() {
-        SPTAuth.defaultInstance().clientID = "87f97846fb5d4f37a2e117bda6acc229"
-        SPTAuth.defaultInstance().redirectURL = URL(string: "SongScrape://returnAfterLogin")
-        SPTAuth.defaultInstance().requestedScopes = [SPTAuthStreamingScope,
-                                                     SPTAuthPlaylistReadPrivateScope,
-                                                     SPTAuthPlaylistModifyPublicScope,
-                                                     SPTAuthPlaylistModifyPrivateScope]
-        loginUrl = SPTAuth.defaultInstance().spotifyWebAuthenticationURL()
-    }
-    
-    
     @IBOutlet weak var backButton: UIBarButtonItem!
     @IBOutlet weak var spotifyImage: UIImageView!
     @IBOutlet weak var applemusicImage: UIImageView!
@@ -78,20 +67,8 @@ class LoginViewController: UIViewController, MPMediaPickerControllerDelegate {
             updateUISpotifyDisabled()
         } else {
             //enable Spotify
-            
             SpotifyLoginPresenter.login(from: self, scopes: [.streaming])
-            
-            
-            /* OLD
-            if UIApplication.shared.openURL(loginUrl!) {
-                if auth.canHandle(auth.redirectURL) {
-                    print("LoginVC: Initializing Spotify connection.")
-                } else {
-                    print("LoginVC: Failed to initialize Spotify connection.")
-                }
-            } */
         }
-        
     }
     
     @IBOutlet weak var applemusicLoginButton: UIButton!
@@ -104,34 +81,18 @@ class LoginViewController: UIViewController, MPMediaPickerControllerDelegate {
         } else {
             //enable Apple Music
             appleMusicCheckIfDeviceCanPlayback()
-            appleMusicRequestPermission()
-            appleMusicFetchStorefrontRegion()
         }
     }
     
     @IBAction func donePress(_ sender: Any) {
         UserDefaults.standard.set(true, forKey: "UserServicesSet")
         UserDefaults.standard.synchronize()
-        if cameFromWelcomeScreen {
-            cameFromWelcomeScreen = false
+        if backButton.isEnabled {
             print("LoginVC: Presenting player as modal")
             performSegue(withIdentifier: "DoneChoosingServices", sender: self)
         } else {
             print("LoginVC: Unwinding to player")
             performSegue(withIdentifier: "ServicesUpdated", sender: self)
-        }
-    }
-    
-    @objc func updateAfterFirstLogin() {
-        if let sessionObj:AnyObject = UserDefaults.standard.object(forKey: "SpotifySession") as AnyObject? {
-            let sessionDataObj = sessionObj as! Data
-            let firstTimeSession = NSKeyedUnarchiver.unarchiveObject(with: sessionDataObj) as! SPTSession
-            self.session = firstTimeSession
-            updateUISpotifyEnabled()
-            UserDefaults.standard.set(self.session.accessToken, forKey: "SpotifyToken")
-            UserDefaults.standard.synchronize()
-        } else {
-            print("LoginVC: Failed to enable Spotify")
         }
     }
     
@@ -187,10 +148,19 @@ class LoginViewController: UIViewController, MPMediaPickerControllerDelegate {
             switch capability {
             case []:
                 print("The user doesn't have an Apple Music subscription available. Now would be a good time to prompt them to buy one?")
+                let alert = UIAlertController(title: "Cannot use Apple Music", message: "You either do not have a valid Apple Music account, or your device is not equipped to play Apple Music.", preferredStyle: UIAlertControllerStyle.alert)
+                alert.addAction(UIAlertAction(title:"OK", style: UIAlertActionStyle.default, handler: { (action) in
+                    alert.dismiss(animated: true, completion: nil)
+                }))
+                self.present(alert, animated: true, completion: nil)
             case SKCloudServiceCapability.musicCatalogPlayback:
                 print("The user has an Apple Music subscription and can playback music!")
+                self.appleMusicRequestPermission()
+                self.appleMusicFetchStorefrontRegion()
             case SKCloudServiceCapability.addToCloudMusicLibrary:
                 print("The user has an Apple Music subscription, can playback music AND can add to the Cloud Music Library")
+                self.appleMusicRequestPermission()
+                self.appleMusicFetchStorefrontRegion()
             default: break
             }
         }
@@ -213,7 +183,6 @@ class LoginViewController: UIViewController, MPMediaPickerControllerDelegate {
             return
         case .notDetermined:
             print("The user hasn't decided yet - so we'll break out of the switch and ask them.")
-            
             // Tell user to hit sign in again
             break
         case .restricted:
@@ -251,7 +220,6 @@ class LoginViewController: UIViewController, MPMediaPickerControllerDelegate {
             guard let storefrontId = storefrontId, storefrontId.characters.count >= 6 else {
                 print("Handle the error - the callback didn't contain a valid storefrontID.")
                 return
-                
             }
             let indexRange = storefrontId.startIndex..<storefrontId.index(storefrontId.startIndex, offsetBy: 5)
             let trimmedId = storefrontId.substring(with: indexRange)
@@ -265,15 +233,14 @@ class LoginViewController: UIViewController, MPMediaPickerControllerDelegate {
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
     }
-    
+    /*
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         guard let dest = segue.destination as? PlayerTableViewController else { return }
         if servicesUpdated {
             //dest.spotifySession = self.session
             dest.thisStorefrontId = self.thisStorefrontId
         }
-    }
+    } */
 
 }

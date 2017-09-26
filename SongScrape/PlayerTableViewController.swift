@@ -92,14 +92,6 @@ class PlayerTableViewController: UITableViewController, SPTAudioStreamingPlaybac
                 self.initializePlayerWithToken(accessToken!)
             }
         }
-        //OLD spotifyInit()
-        /* OLD
-        if let spotifySession = spotifySession {
-            initializePlayer(authSession: spotifySession)
-        } else {
-            print("Failed to retrieve Spotify session.")
-        }
-         */
         
         UIApplication.shared.beginReceivingRemoteControlEvents()
         let commandCenter = MPRemoteCommandCenter.shared()
@@ -234,14 +226,13 @@ class PlayerTableViewController: UITableViewController, SPTAudioStreamingPlaybac
         }
     }
     
-    
-    
     ////// Playback helper functions
     
     func setLockInfo(for song:Song)
     {
         let art = MPMediaItemArtwork.init(image: song.artwork!)
-        let songInfo :[String : Any] = [MPMediaItemPropertyTitle: song.title ,MPMediaItemPropertyArtwork : art, MPMediaItemPropertyArtist: song.artist, MPNowPlayingInfoPropertyElapsedPlaybackTime: 0, MPMediaItemPropertyPlaybackDuration: 100, MPNowPlayingInfoPropertyPlaybackRate: 1]
+        let timeInSeconds = Int((song.duration/1000))
+        let songInfo :[String : Any] = [MPMediaItemPropertyTitle: song.title ,MPMediaItemPropertyArtwork : art, MPMediaItemPropertyArtist: song.artist, MPNowPlayingInfoPropertyElapsedPlaybackTime: 0, MPMediaItemPropertyPlaybackDuration: timeInSeconds, MPNowPlayingInfoPropertyPlaybackRate: 1]
         MPNowPlayingInfoCenter.default().nowPlayingInfo = songInfo
     }
     
@@ -298,15 +289,8 @@ class PlayerTableViewController: UITableViewController, SPTAudioStreamingPlaybac
             case .spotify:
                 playSongWithSpotify(song: queue[0])
             case .applemusic:
-                appleMusicPlayTrackId([queue[0].appleId!])
-                self.albumArtView.image = queue[0].artwork!
-                queue[0].artwork!.getColors { colors in
-                    self.setColors(with: colors.background)
-                }
-                self.titleLabel.text = queue[0].title
-                self.musicSourceLabel.text = "VIA APPLE MUSIC"
-                self.musicSourceLabel.textColor = UIColor(red:0.65, green:0.43, blue:0.76, alpha:1.0)
-                self.artistAlbumLabel.text = "\(queue[0].artist) - \(queue[0].album)"
+                playSongWithApple(song: queue[0])
+                
             default:
                 print("PlayerTVC: no music playing")
             }
@@ -338,7 +322,8 @@ class PlayerTableViewController: UITableViewController, SPTAudioStreamingPlaybac
     
     func updateUINothingPlaying() {
         nothingPlaying = true
-        self.albumArtView.image = #imageLiteral(resourceName: "placeholder")
+        self.albumArtView.image = #imageLiteral(resourceName: "placeholder2")
+        self.albumArtView.alpha = 0.4
         self.titleLabel.text = "No Music Playing"
         self.musicSourceLabel.text = " "
         self.musicSourceLabel.textColor = .black
@@ -356,11 +341,12 @@ class PlayerTableViewController: UITableViewController, SPTAudioStreamingPlaybac
     var sptToken: String?
     
     func playSongWithSpotify(song: Song) {
-        self.player?.playSpotifyURI(song.spotifyUri!, startingWith: 0, startingWithPosition: Double(song.startTime!), callback: { (error) in
+        self.player?.playSpotifyURI(song.spotifyUri!, startingWith: 0, startingWithPosition: 0, callback: { (error) in
             if (error != nil) {
                 print("PlayerTVC: Error playing music with Spotify")
             } else {
                 self.setLockInfo(for: song)
+                self.albumArtView.alpha = 1.0
                 self.albumArtView.image = song.artwork!
                 song.artwork!.getColors { colors in
                 self.setColors(with: colors.background)
@@ -442,35 +428,37 @@ class PlayerTableViewController: UITableViewController, SPTAudioStreamingPlaybac
     }
     
     
-    
     // Apple Music Playback
  
+    func playSongWithApple(song: Song) {
+        appleMusicPlayTrackId([song.appleId!])
+        setLockInfo(for: song)
+        self.albumArtView.alpha = 1.0
+        self.albumArtView.image = song.artwork!
+        song.artwork!.getColors { colors in
+            self.setColors(with: colors.background)
+        }
+        self.titleLabel.text = song.title
+        self.musicSourceLabel.text = "VIA APPLE MUSIC"
+        self.musicSourceLabel.textColor = UIColor(red:0.65, green:0.43, blue:0.76, alpha:1.0)
+        self.artistAlbumLabel.text = "\(song.artist) - \(song.album)"
+    }
+    
     func appleMusicPlayTrackId(_ ids:[String]) {
         applicationMusicPlayer.setQueue(with: ids)
         applicationMusicPlayer.play()
     }
     
     
-    // Segue Preparation
-    
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if let navController = segue.destination as? UINavigationController {
-            if let queueVC = navController.topViewController as? QueueSongViewController {
-                print("PlayerTVC: # PlayerTableController -> QueueSong")
-                queueVC.sptToken = self.sptToken
-                queueVC.storefrontId = self.thisStorefrontId
-            } else if let loginVC = navController.topViewController as? LoginViewController {
-                print("PlayerTVC: # PlayerTableController -> LoginView")
-                loginVC.player = self.player
-                loginVC.thisStorefrontId = self.thisStorefrontId
-                loginVC.cameFromWelcomeScreen = false
-            }
-        }
-    }
-    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        guard let destNav = segue.destination as? UINavigationController else { return }
+        guard let dest = destNav.viewControllers[0] as? LoginViewController else { return }
+        dest.backButton.isEnabled = false
     }
     
     
@@ -480,11 +468,20 @@ class PlayerTableViewController: UITableViewController, SPTAudioStreamingPlaybac
         return 1
     }
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if queue.isEmpty {
+            return 1
+        }
         return queue.count
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         var cell:UITableViewCell?
+        if queue.isEmpty {
+            cell = tableView.dequeueReusableCell(withIdentifier: "NoSongsCell", for: indexPath)
+            cell!.layer.cornerRadius = 5
+            cell!.layer.masksToBounds = true
+            return cell!
+        }
         let song = queue[indexPath.row]
         if song.service == .spotify {
             cell = tableView.dequeueReusableCell(withIdentifier: "SpotifyItem", for: indexPath)
@@ -497,6 +494,10 @@ class PlayerTableViewController: UITableViewController, SPTAudioStreamingPlaybac
         cell!.textLabel?.text = song.title
         cell!.detailTextLabel?.text = song.artist + " - " + song.album
         return cell!
+    }
+    
+    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        return !(queue.isEmpty && indexPath.row == 0)
     }
     
     override func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCellEditingStyle {
@@ -523,5 +524,10 @@ class PlayerTableViewController: UITableViewController, SPTAudioStreamingPlaybac
         queueTable.reloadData()
     }
     
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if queue.isEmpty && indexPath.row == 0 {
+            performSegue(withIdentifier: "AddSong", sender: self)
+        }
+    }
 
 }

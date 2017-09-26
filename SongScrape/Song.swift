@@ -16,24 +16,26 @@ class Song {
     var service:Service
     var spotifyUri:String?
     var appleId:String?
-    var startTime:Int?
+    var duration:Double
+    var hdImageUrl:String?
     
     enum Service {
         case spotify, applemusic, soundcloud, local
     }
     
-    init(title:String, artist:String, album:String, artwork: UIImage?, service:Service, spotifyUri:String?, startTime:Int?, appleId:String?) {
+    init(title:String, artist:String, album:String, artwork: UIImage?, service:Service, spotifyUri:String?, duration:Double, appleId:String?, hdImageUrl:String?) {
         self.title = title
         self.artist = artist
         self.album = album
         if let artwork = artwork {
             self.artwork = artwork
         } else {
-            self.artwork = #imageLiteral(resourceName: "placeholder")
+            self.artwork = #imageLiteral(resourceName: "placeholder2")
         }
         self.service = service
         self.spotifyUri = spotifyUri
-        self.startTime = startTime
+        self.duration = duration
         self.appleId = appleId
+        self.hdImageUrl = hdImageUrl
     }
 }
