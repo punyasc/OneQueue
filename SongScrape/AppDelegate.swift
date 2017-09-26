@@ -22,6 +22,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         //auth.sessionUserDefaultsKey = "current session"
         SpotifyLogin.shared.configure(clientID: "87f97846fb5d4f37a2e117bda6acc229", clientSecret: "61083133aebd4690ad102f87385cd8d3", redirectURL: URL(string: "onequeue://returnafterlogin")!)
         
+        if UserDefaults.standard.bool(forKey: "UserServicesSet") {
+            let storyboard = UIStoryboard(name: "Main", bundle: nil)
+            let initialViewController = storyboard.instantiateViewController(withIdentifier: "PlayerTVC")
+            self.window?.rootViewController = initialViewController
+            self.window?.makeKeyAndVisible()
+        }
+        
+        
         return true
     }
     

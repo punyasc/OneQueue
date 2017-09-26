@@ -79,7 +79,6 @@ class PlayerTableViewController: UITableViewController, SPTAudioStreamingPlaybac
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
         self.editButton.alpha = 0.0
         updateUINothingPlaying()
         
@@ -128,6 +127,7 @@ class PlayerTableViewController: UITableViewController, SPTAudioStreamingPlaybac
         print(not.description)
         if applicationMusicPlayer.playbackState == .stopped {
             //song finished
+            print("PlayerTVC: Apple Music streaming stopped.")
             refreshQueue()
         } else if applicationMusicPlayer.playbackState == .paused {
             //paused
@@ -213,6 +213,7 @@ class PlayerTableViewController: UITableViewController, SPTAudioStreamingPlaybac
     }
     
     func skipForward() {
+        print("PlayerTVC: skipForward() called")
         isPaused = false
         if lastSong!.spotifyUri != nil {
             player!.setIsPlaying(false, callback: { error in

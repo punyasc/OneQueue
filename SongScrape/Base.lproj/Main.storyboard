@@ -72,12 +72,12 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="9vh-4W-c1q" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-1263.768115942029" y="93.750000000000014"/>
+            <point key="canvasLocation" x="-2239" y="92"/>
         </scene>
         <!--Player Table View Controller-->
         <scene sceneID="afx-Mo-cSq">
             <objects>
-                <tableViewController id="6Eq-fG-4fJ" customClass="PlayerTableViewController" customModule="SongScrape" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController storyboardIdentifier="PlayerTVC" id="6Eq-fG-4fJ" customClass="PlayerTableViewController" customModule="SongScrape" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="28" id="R35-Hw-n1s">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -123,7 +123,7 @@
                                         <stackView opaque="NO" contentMode="scaleToFill" alignment="center" spacing="50" translatesAutoresizingMaskIntoConstraints="NO" id="w66-Yj-hsT">
                                             <rect key="frame" x="45" y="363.5" width="230" height="50"/>
                                             <subviews>
-                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="3TR-Fp-GPZ">
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="3TR-Fp-GPZ">
                                                     <rect key="frame" x="0.0" y="5" width="40" height="40"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="40" id="3Pn-UL-3wl"/>
@@ -134,7 +134,7 @@
                                                         <action selector="skipBackwardPress:" destination="6Eq-fG-4fJ" eventType="touchUpInside" id="33S-D3-bf9"/>
                                                     </connections>
                                                 </button>
-                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="tVn-tx-ebd">
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="tVn-tx-ebd">
                                                     <rect key="frame" x="90" y="0.0" width="50" height="50"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" constant="50" id="4r0-5e-Fww"/>
@@ -145,7 +145,7 @@
                                                         <action selector="playPausePress:" destination="6Eq-fG-4fJ" eventType="touchUpInside" id="4gF-7G-oPq"/>
                                                     </connections>
                                                 </button>
-                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="XEz-I2-NWj">
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="XEz-I2-NWj">
                                                     <rect key="frame" x="190" y="5" width="40" height="40"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" constant="40" id="1Ah-Dp-Uck"/>
@@ -167,7 +167,7 @@
                                                         <segue destination="LiQ-pi-II5" kind="presentation" identifier="ChangeServices" id="Tub-Mj-4wo"/>
                                                     </connections>
                                                 </button>
-                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="contactAdd" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="tDL-mp-CjK">
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="contactAdd" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="tDL-mp-CjK">
                                                     <rect key="frame" x="238" y="0.0" width="22" height="22"/>
                                                     <connections>
                                                         <action selector="addSongPress:" destination="6Eq-fG-4fJ" eventType="touchUpInside" id="Q28-QW-QvQ"/>
@@ -321,7 +321,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ioX-LD-ZRo" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-1397.1014492753625" y="1145.3804347826087"/>
+            <point key="canvasLocation" x="-1701" y="968"/>
         </scene>
         <!--Add Song-->
         <scene sceneID="LrK-bx-HuD">
@@ -546,7 +546,7 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="CpF-3L-ien" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <exit id="7MD-zf-Xt0" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
-            <point key="canvasLocation" x="304" y="92"/>
+            <point key="canvasLocation" x="-60" y="72"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="2OV-x9-q68">
@@ -564,7 +564,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="f20-T9-ONC" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-394.20289855072468" y="92.934782608695656"/>
+            <point key="canvasLocation" x="-748" y="72"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="l6g-BX-Jdt">
@@ -596,6 +596,6 @@
     </resources>
     <inferredMetricsTieBreakers>
         <segue reference="Tub-Mj-4wo"/>
-        <segue reference="h0G-7u-13r"/>
+        <segue reference="LYZ-PU-DaC"/>
     </inferredMetricsTieBreakers>
 </document>

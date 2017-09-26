@@ -71,6 +71,7 @@ class LoginViewController: UIViewController, MPMediaPickerControllerDelegate {
     @IBOutlet weak var applemusicLoginButton: UIButton!
     @IBOutlet weak var applemusicLoginLabel: UILabel!
     @IBAction func applemusicLoginPress(_ sender: Any) {
+        print("LoginVC: Apple login press")
         servicesUpdated = true
         if UserDefaults.standard.bool(forKey: "AppleMusicEnabled") {
             //disable Apple Music
@@ -140,6 +141,7 @@ class LoginViewController: UIViewController, MPMediaPickerControllerDelegate {
     
     
     func appleMusicCheckIfDeviceCanPlayback() {
+        print("LoginVC: Checking if device can playback")
         let serviceController = SKCloudServiceController()
         serviceController.requestCapabilities { (capability:SKCloudServiceCapability, err:Error?) in
             switch capability {
@@ -158,7 +160,11 @@ class LoginViewController: UIViewController, MPMediaPickerControllerDelegate {
                 print("The user has an Apple Music subscription, can playback music AND can add to the Cloud Music Library")
                 self.appleMusicRequestPermission()
                 self.appleMusicFetchStorefrontRegion()
-            default: break
+            default:
+                print("LoginVC: Default case")
+                self.appleMusicRequestPermission()
+                self.appleMusicFetchStorefrontRegion()
+                break
             }
         }
     }
@@ -167,7 +173,9 @@ class LoginViewController: UIViewController, MPMediaPickerControllerDelegate {
         switch SKCloudServiceController.authorizationStatus() {
         case .authorized:
             print("The user's already authorized - we don't need to do anything more here, so we'll exit early.")
-            updateUIAppleEnabled()
+            DispatchQueue.main.async {
+                self.updateUIAppleEnabled()
+            }
             return
         case .denied:
             print("The user has selected 'Don't Allow' in the past - so we're going to show them a different dialog to push them through to their Settings page and change their mind, and exit the function early.")
@@ -184,6 +192,11 @@ class LoginViewController: UIViewController, MPMediaPickerControllerDelegate {
             break
         case .restricted:
             print("User may be restricted; for example, if the device is in Education mode, it limits external Apple Music usage. This is similar behaviour to Denied.")
+            let alert = UIAlertController(title: "Cannot use Apple Music", message: "You have a restriction on your Apple Music account that is preventing you from streaming music.", preferredStyle: UIAlertControllerStyle.alert)
+            alert.addAction(UIAlertAction(title:"OK", style: UIAlertActionStyle.default, handler: { (action) in
+                alert.dismiss(animated: true, completion: nil)
+            }))
+            self.present(alert, animated: true, completion: nil)
             return
         }
         let alert = UIAlertController(title: "Allow Apple Music access", message: "In case Apple Music has not already been enabled, press Sign In again.", preferredStyle: UIAlertControllerStyle.alert)
@@ -195,7 +208,9 @@ class LoginViewController: UIViewController, MPMediaPickerControllerDelegate {
             switch status {
             case .authorized:
                 print("All good - the user tapped 'OK', so you're clear to move forward and start playing.")
-                self.updateUIAppleEnabled()
+                DispatchQueue.main.async {
+                    self.updateUIAppleEnabled()
+                }
             case .denied:
                 print("The user tapped 'Don't allow'. Read on about that below...")
             case .notDetermined:
