@@ -9,6 +9,7 @@
 import UIKit
 import StoreKit
 import MediaPlayer
+import SpotifyLogin
 
 class LoginViewController: UIViewController, MPMediaPickerControllerDelegate {
     
@@ -45,8 +46,9 @@ class LoginViewController: UIViewController, MPMediaPickerControllerDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        spotifyConnectionInit()
-        NotificationCenter.default.addObserver(self, selector: Selector("updateAfterFirstLogin"), name: Notification.Name(rawValue: "loginSuccessful"), object: nil)
+        //OLD spotifyConnectionInit()
+        //OLD NotificationCenter.default.addObserver(self, selector: Selector("updateAfterFirstLogin"), name: Notification.Name(rawValue: "loginSuccessful"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(loginSuccessful), name: .SpotifyLoginSuccessful, object: nil)
     }
     
     @IBAction func unwindToLogin(unwindSegue: UIStoryboardSegue) { }
@@ -76,13 +78,18 @@ class LoginViewController: UIViewController, MPMediaPickerControllerDelegate {
             updateUISpotifyDisabled()
         } else {
             //enable Spotify
+            
+            SpotifyLoginPresenter.login(from: self, scopes: [.streaming])
+            
+            
+            /* OLD
             if UIApplication.shared.openURL(loginUrl!) {
                 if auth.canHandle(auth.redirectURL) {
                     print("LoginVC: Initializing Spotify connection.")
                 } else {
                     print("LoginVC: Failed to initialize Spotify connection.")
                 }
-            }
+            } */
         }
         
     }
@@ -125,6 +132,19 @@ class LoginViewController: UIViewController, MPMediaPickerControllerDelegate {
             UserDefaults.standard.synchronize()
         } else {
             print("LoginVC: Failed to enable Spotify")
+        }
+    }
+    
+    @objc func loginSuccessful() {
+        SpotifyLogin.shared.getAccessToken { (accessToken, error) in
+            if error != nil {
+                print("LoginVC: Failure to log in to Spotify")
+                //failure to log in
+            } else {
+                //successful login
+                print("LoginVC: Spotify access token: \(accessToken!)")
+                self.updateUISpotifyEnabled()
+            }
         }
     }
     
@@ -251,7 +271,7 @@ class LoginViewController: UIViewController, MPMediaPickerControllerDelegate {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         guard let dest = segue.destination as? PlayerTableViewController else { return }
         if servicesUpdated {
-            dest.spotifySession = self.session
+            //dest.spotifySession = self.session
             dest.thisStorefrontId = self.thisStorefrontId
         }
     }

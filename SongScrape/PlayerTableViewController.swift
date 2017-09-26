@@ -12,7 +12,7 @@ import StoreKit
 import MediaPlayer
 import AVKit
 import UIImageColors
-
+import SpotifyLogin
 
 extension UIColor {
     
@@ -83,12 +83,23 @@ class PlayerTableViewController: UITableViewController, SPTAudioStreamingPlaybac
         self.editButton.alpha = 0.0
         updateUINothingPlaying()
         
-        spotifyInit()
+        SpotifyLogin.shared.getAccessToken { (accessToken, error) in
+            if error != nil {
+                print("PlayerTVC: Failed to get access token")
+                //failed to get access token
+            } else {
+                print("PlayerTVC: About to initialize player")
+                self.initializePlayerWithToken(accessToken!)
+            }
+        }
+        //OLD spotifyInit()
+        /* OLD
         if let spotifySession = spotifySession {
             initializePlayer(authSession: spotifySession)
         } else {
             print("Failed to retrieve Spotify session.")
         }
+         */
         
         UIApplication.shared.beginReceivingRemoteControlEvents()
         let commandCenter = MPRemoteCommandCenter.shared()
@@ -393,8 +404,8 @@ class PlayerTableViewController: UITableViewController, SPTAudioStreamingPlaybac
                                                      SPTAuthPlaylistModifyPrivateScope]
     }
     
-    func initializePlayerWithToken() {
-        guard let accessToken = UserDefaults.standard.string(forKey: "SpotifyAccessToken")  else { return }
+    func initializePlayerWithToken(_ accessToken: String) {
+        //guard let accessToken = UserDefaults.standard.string(forKey: "SpotifyAccessToken")  else { return }
         if self.player == nil {
             self.player = SPTAudioStreamingController.sharedInstance()
             self.player!.playbackDelegate = self
@@ -404,6 +415,7 @@ class PlayerTableViewController: UITableViewController, SPTAudioStreamingPlaybac
             } else {
                 try! player!.start(withClientId: auth.clientID)
                 self.player!.login(withAccessToken: accessToken)
+                print("PlayerTVC: Successful Spotify player initialization")
             }
             sptToken = accessToken
         } else {

@@ -9,6 +9,7 @@
 import UIKit
 import Alamofire
 import SwiftyJSON
+import SpotifyLogin
 
 class QueueSongViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate {
     
@@ -72,7 +73,14 @@ class QueueSongViewController: UIViewController, UITableViewDelegate, UITableVie
         /* Search Spotify */
         if UserDefaults.standard.bool(forKey: "SpotifyEnabled") {
             let spotifySearchUrl = "https://api.spotify.com/v1/search?q=\(fixedQuery)&market=US&type=track&limit=5"
-            callSpotify(url: spotifySearchUrl)
+            SpotifyLogin.shared.getAccessToken { (accessToken, error) in
+                if error != nil {
+                    //failed to get access token
+                } else {
+                    self.callSpotify(url: spotifySearchUrl, token: accessToken!)
+                }
+            }
+            
         } else {
             spotifyDoneLoading = true
         }
@@ -186,11 +194,12 @@ class QueueSongViewController: UIViewController, UITableViewDelegate, UITableVie
         })
     }
     
-    func callSpotify(url: String) {
+    func callSpotify(url: String, token: String) {
+        /*
         guard let token = UserDefaults.standard.string(forKey: "SpotifyToken") else {
             print("Could not fetch Spotify token for search")
             return
-        }
+        }*/
         
         let headers: HTTPHeaders = [
             "Authorization": "Bearer \(token)",
