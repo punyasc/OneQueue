@@ -10,7 +10,6 @@
 		1CED232A42C2BF4E33AD4EA6 /* Pods_SongScrapeTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D084CBD3E4B5A99436832BC2 /* Pods_SongScrapeTests.framework */; };
 		3CAEDA12194AE22C0EF5D9E3 /* Pods_SongScrapeUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C6A4E60AA7F5ECFA3CFCC856 /* Pods_SongScrapeUITests.framework */; };
 		B56F43E31F70FCA8004A381E /* PlayerTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B56F43E21F70FCA8004A381E /* PlayerTableViewController.swift */; };
-		B56F43E51F718D06004A381E /* PlayerTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B56F43E41F718D06004A381E /* PlayerTableViewCell.swift */; };
 		B56F43E71F71F148004A381E /* WelcomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B56F43E61F71F147004A381E /* WelcomeViewController.swift */; };
 		B572D0EE1F3A0E4D00C7FC82 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B572D0ED1F3A0E4D00C7FC82 /* AppDelegate.swift */; };
 		B572D0F31F3A0E4D00C7FC82 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B572D0F11F3A0E4D00C7FC82 /* Main.storyboard */; };
@@ -65,7 +64,6 @@
 		A6DA0E7B3026FE29AC121D43 /* Pods-SongScrapeUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SongScrapeUITests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-SongScrapeUITests/Pods-SongScrapeUITests.debug.xcconfig"; sourceTree = "<group>"; };
 		B500D6FC1F75F8D100ED70EE /* Pods_SongScrape.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Pods_SongScrape.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B56F43E21F70FCA8004A381E /* PlayerTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PlayerTableViewController.swift; path = SongScrape/PlayerTableViewController.swift; sourceTree = "<group>"; };
-		B56F43E41F718D06004A381E /* PlayerTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PlayerTableViewCell.swift; path = SongScrape/PlayerTableViewCell.swift; sourceTree = "<group>"; };
 		B56F43E61F71F147004A381E /* WelcomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = WelcomeViewController.swift; path = SongScrape/WelcomeViewController.swift; sourceTree = "<group>"; };
 		B572D0EA1F3A0E4D00C7FC82 /* SongScrape.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SongScrape.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B572D0ED1F3A0E4D00C7FC82 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = SongScrape/AppDelegate.swift; sourceTree = "<group>"; };
@@ -176,7 +174,6 @@
 				B59A6A1C1F3C1EC5008BE3BA /* LoginViewController.swift */,
 				B56F43E21F70FCA8004A381E /* PlayerTableViewController.swift */,
 				B5AF65251F6E024C0076FFDA /* QueueSongViewController.swift */,
-				B56F43E41F718D06004A381E /* PlayerTableViewCell.swift */,
 				B572D0F41F3A0E4D00C7FC82 /* Assets.xcassets */,
 				B572D0F61F3A0E4D00C7FC82 /* LaunchScreen.storyboard */,
 				B572D0F91F3A0E4D00C7FC82 /* Info.plist */,
@@ -510,7 +507,6 @@
 				B5DA8C111F3FD1D90063C8CB /* Song.swift in Sources */,
 				B59A6A1D1F3C1EC5008BE3BA /* LoginViewController.swift in Sources */,
 				B5ADD8561F3A12B30076DE3F /* BridgeViewController.m in Sources */,
-				B56F43E51F718D06004A381E /* PlayerTableViewCell.swift in Sources */,
 				B572D0EE1F3A0E4D00C7FC82 /* AppDelegate.swift in Sources */,
 				B56F43E71F71F148004A381E /* WelcomeViewController.swift in Sources */,
 			);

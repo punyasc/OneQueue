@@ -18,8 +18,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var auth = SPTAuth()
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-        //auth.redirectURL     = URL(string: "SongScrape://returnAfterLogin")
-        //auth.sessionUserDefaultsKey = "current session"
         SpotifyLogin.shared.configure(clientID: "87f97846fb5d4f37a2e117bda6acc229", clientSecret: "61083133aebd4690ad102f87385cd8d3", redirectURL: URL(string: "onequeue://returnafterlogin")!)
         
         if UserDefaults.standard.bool(forKey: "UserServicesSet") {

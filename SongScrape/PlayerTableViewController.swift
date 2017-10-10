@@ -41,6 +41,8 @@ extension UIColor {
 
 class PlayerTableViewController: UITableViewController, SPTAudioStreamingPlaybackDelegate, SPTAudioStreamingDelegate {
     
+    var sptToken: String?
+    var spotifyUpNext = false
     var deleteMode = false
     var nothingPlaying = true
     var oldQueueCount = 0
@@ -69,8 +71,23 @@ class PlayerTableViewController: UITableViewController, SPTAudioStreamingPlaybac
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        
         queueTable.reloadData()
         queueTable.setEditing(true, animated: true)
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        if spotifyUpNext {
+            print("Spotify Up Next")
+            player?.setIsPlaying(true, callback: { error in
+                if error != nil {
+                    print("PlayerTVC: Error playing music from Spotify")
+                    return
+                }
+            })
+            spotifyUpNext = false
+        }
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -116,6 +133,7 @@ class PlayerTableViewController: UITableViewController, SPTAudioStreamingPlaybac
             return .success
         }
         
+        
         applicationMusicPlayer.beginGeneratingPlaybackNotifications()
         applicationMusicPlayer.repeatMode = .none
         
@@ -128,13 +146,19 @@ class PlayerTableViewController: UITableViewController, SPTAudioStreamingPlaybac
         if applicationMusicPlayer.playbackState == .stopped {
             //song finished
             print("PlayerTVC: Apple Music streaming stopped.")
+            playPauseButton.setTitle("Play", for: .normal)
+            playPauseButton.setImage(#imageLiteral(resourceName: "Play Filled-100"), for: .normal)
             refreshQueue()
         } else if applicationMusicPlayer.playbackState == .paused {
             //paused
+            print("PlayerTVC: Apple Music streaming paused.")
+            isPaused = true
             playPauseButton.setTitle("Play", for: .normal)
             playPauseButton.setImage(#imageLiteral(resourceName: "Play Filled-100"), for: .normal)
         } else if applicationMusicPlayer.playbackState == .playing {
             //playing
+            print("PlayerTVC: Apple Music streaming playing.")
+            isPaused = false
             playPauseButton.setTitle("Pause", for: .normal)
             playPauseButton.setImage(#imageLiteral(resourceName: "Pause Filled-100"), for: .normal)
         }
@@ -164,9 +188,7 @@ class PlayerTableViewController: UITableViewController, SPTAudioStreamingPlaybac
                 alert.dismiss(animated: true, completion: nil)
             }))
             alert.addAction(UIAlertAction(title:"Add a service", style: UIAlertActionStyle.default, handler: { (action) in
-                //UIAlertActionStyle.
                 self.performSegue(withIdentifier: "ChangeServices", sender: self)
-                //alert.dismiss(animated: true, completion: nil)
             }))
             self.present(alert, animated: true, completion: nil)
         } else {
@@ -282,21 +304,17 @@ class PlayerTableViewController: UITableViewController, SPTAudioStreamingPlaybac
     
     func refreshQueue() {
         if queue.count > 0 {
-            isPaused = false
+            //isPaused = false
             nothingPlaying = false
-            playPauseButton.setTitle("Pause", for: .normal)
-            playPauseButton.setImage(#imageLiteral(resourceName: "Pause Filled-100"), for: .normal)
             switch queue[0].service {
             case .spotify:
                 playSongWithSpotify(song: queue[0])
             case .applemusic:
                 playSongWithApple(song: queue[0])
-                
             default:
                 print("PlayerTVC: no music playing")
             }
             lastSong = queue[0]
-            //updateNowPlayingCenter(title: lastSong!.title, artist: lastSong!.artist)
             queue.removeFirst()
         } else {
             print("PlayerTVC: queue is empty")
@@ -334,18 +352,29 @@ class PlayerTableViewController: UITableViewController, SPTAudioStreamingPlaybac
         lastSong = nil
     }
     
-    
-    
-    
     // Spotify Playback
     
-    var sptToken: String?
+    func setSpotifyUpNext() {
+        let state: UIApplicationState = UIApplication.shared.applicationState
+        
+        if state == .background {
+            print("PlayerTVC: Shifted to background ")
+            spotifyUpNext = true
+            // background
+        }
+        else if state == .active {
+            print("PlayerTVC: Shifted to foreground")
+            spotifyUpNext = false
+            // foreground
+        }
+    }
     
     func playSongWithSpotify(song: Song) {
-        self.player?.playSpotifyURI(song.spotifyUri!, startingWith: 0, startingWithPosition: 0, callback: { (error) in
+        player?.playSpotifyURI(song.spotifyUri!, startingWith: 0, startingWithPosition: 0, callback: { (error) in
             if (error != nil) {
                 print("PlayerTVC: Error playing music with Spotify")
             } else {
+                print("Playing song next with Spotify")
                 self.setLockInfo(for: song)
                 self.albumArtView.alpha = 1.0
                 self.albumArtView.image = song.artwork!
@@ -360,39 +389,46 @@ class PlayerTableViewController: UITableViewController, SPTAudioStreamingPlaybac
                 self.playPauseButton.setImage(#imageLiteral(resourceName: "Pause Filled-100"), for: .normal)
             }
         })
+        setSpotifyUpNext()
+        player?.setIsPlaying(true, callback: { error in
+            if error != nil {
+                print("PlayerTVC: Error playing music from Spotify")
+                return
+            } else {
+                print("Spotify play success")
+            }
+        })
     }
     
     func audioStreaming(_ audioStreaming: SPTAudioStreamingController!, didChangePlaybackStatus isPlaying: Bool) {
+        print("audioStreaming()\n-----------")
         print("isPlaying: \(isPlaying)")
+        
+        
         if (isPlaying) {
             //isPaused = false
-            print("SONGDUN")
+            print("audioStreaming:isPlaying")
+            isPaused = false
             try! AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback)
             try! AVAudioSession.sharedInstance().setActive(true)
         } else {
-            print("SONGO")
-            //isPaused = true
-            if !isPaused {
-                print("Song is not halted, it's over. Keep going")
-                refreshQueue()
-            } else {
-                print("Song halted, but it's paused so we're not moving on")
-            }
-            try! AVAudioSession.sharedInstance().setActive(false)
+            print("audioStreaming:!isPlaying")
+            
+                if !isPaused {
+                    print("audioStreaming:!isPaused")
+                    playPauseButton.setTitle("Play", for: .normal)
+                    playPauseButton.setImage(#imageLiteral(resourceName: "Play Filled-100"), for: .normal)
+                    print("PlayerTVC: Song is OVER. Next song")
+                    refreshQueue()
+                } else {
+                    print("audioStreaming:!isPaused")
+                    print("PlayerTVC: Song is PAUSED. Do nothing")
+                }
+                try! AVAudioSession.sharedInstance().setActive(false)
         }
     }
     
-    func spotifyInit() {
-        SPTAuth.defaultInstance().clientID = "87f97846fb5d4f37a2e117bda6acc229"
-        SPTAuth.defaultInstance().redirectURL = URL(string: "SongScrape://returnAfterLogin")
-        SPTAuth.defaultInstance().requestedScopes = [SPTAuthStreamingScope,
-                                                     SPTAuthPlaylistReadPrivateScope,
-                                                     SPTAuthPlaylistModifyPublicScope,
-                                                     SPTAuthPlaylistModifyPrivateScope]
-    }
-    
     func initializePlayerWithToken(_ accessToken: String) {
-        //guard let accessToken = UserDefaults.standard.string(forKey: "SpotifyAccessToken")  else { return }
         if self.player == nil {
             self.player = SPTAudioStreamingController.sharedInstance()
             self.player!.playbackDelegate = self
@@ -409,25 +445,6 @@ class PlayerTableViewController: UITableViewController, SPTAudioStreamingPlaybac
             print("player not initialized")
         }
     }
-    
-    func initializePlayer(authSession:SPTSession){
-        
-        if self.player == nil {
-            self.player = SPTAudioStreamingController.sharedInstance()
-            self.player!.playbackDelegate = self
-            self.player!.delegate = self
-            if self.player!.initialized {
-                print("player already initialized")
-            } else {
-                try! player!.start(withClientId: auth.clientID)
-                self.player!.login(withAccessToken: authSession.accessToken)
-            }
-            sptToken = authSession.accessToken
-        } else {
-            print("player not initialized")
-        }
-    }
-    
     
     // Apple Music Playback
  
@@ -453,7 +470,6 @@ class PlayerTableViewController: UITableViewController, SPTAudioStreamingPlaybac
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {

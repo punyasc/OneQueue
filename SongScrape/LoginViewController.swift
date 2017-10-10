@@ -17,11 +17,9 @@ class LoginViewController: UIViewController, MPMediaPickerControllerDelegate {
     let searchUrlBase = "https://api.spotify.com/v1/search?q="
     var thisStorefrontId:String?
     var servicesUpdated = false
-    //var cameFromWelcomeScreen = true
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        //backButton.isEnabled = cameFromWelcomeScreen
         servicesUpdated = false
         if UserDefaults.standard.bool(forKey: "SpotifyEnabled") {
             updateUISpotifyEnabled()
@@ -43,8 +41,6 @@ class LoginViewController: UIViewController, MPMediaPickerControllerDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        //OLD spotifyConnectionInit()
-        //OLD NotificationCenter.default.addObserver(self, selector: Selector("updateAfterFirstLogin"), name: Notification.Name(rawValue: "loginSuccessful"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(loginSuccessful), name: .SpotifyLoginSuccessful, object: nil)
     }
     
@@ -57,7 +53,6 @@ class LoginViewController: UIViewController, MPMediaPickerControllerDelegate {
     @IBOutlet weak var spotifyLoginButton: UIButton!
     @IBOutlet weak var spotifyLoginLabel: UILabel!
     @IBAction func spotifyLoginPress(_ sender: Any) {
-        
         servicesUpdated = true
         if UserDefaults.standard.bool(forKey: "SpotifyEnabled") {
             //disable Spotify

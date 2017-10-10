@@ -332,7 +332,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" translatesAutoresizingMaskIntoConstraints="NO" id="fgf-o5-dhr">
-                                <rect key="frame" x="0.0" y="172" width="320" height="396"/>
+                                <rect key="frame" x="0.0" y="116" width="320" height="452"/>
                                 <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="SongCell" textLabel="ATS-Sc-VsD" detailTextLabel="57U-pU-zS9" style="IBUITableViewCellStyleSubtitle" id="CVS-bc-scg">
@@ -370,20 +370,13 @@
                                 </constraints>
                                 <color key="color" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             </activityIndicatorView>
-                            <searchBar contentMode="redraw" translatesAutoresizingMaskIntoConstraints="NO" id="9FC-IU-15T">
-                                <rect key="frame" x="0.0" y="116" width="320" height="56"/>
-                                <textInputTraits key="textInputTraits"/>
-                            </searchBar>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="O8c-i6-bel" firstAttribute="centerY" secondItem="IDJ-pM-mBv" secondAttribute="centerY" id="1Nq-Ca-88s"/>
-                            <constraint firstItem="9FC-IU-15T" firstAttribute="trailing" secondItem="ewG-uO-fKG" secondAttribute="trailing" id="ZZX-Ww-Dpe"/>
-                            <constraint firstItem="9FC-IU-15T" firstAttribute="leading" secondItem="ewG-uO-fKG" secondAttribute="leading" id="ahq-JC-567"/>
                             <constraint firstItem="ewG-uO-fKG" firstAttribute="bottom" secondItem="fgf-o5-dhr" secondAttribute="bottom" id="ayF-XP-1Zt"/>
-                            <constraint firstItem="9FC-IU-15T" firstAttribute="top" secondItem="ewG-uO-fKG" secondAttribute="top" id="be1-Gn-wf7"/>
+                            <constraint firstItem="fgf-o5-dhr" firstAttribute="top" secondItem="ewG-uO-fKG" secondAttribute="top" id="e91-Fr-lu4"/>
                             <constraint firstItem="fgf-o5-dhr" firstAttribute="leading" secondItem="ewG-uO-fKG" secondAttribute="leading" id="fHp-9M-H99"/>
-                            <constraint firstItem="fgf-o5-dhr" firstAttribute="top" secondItem="9FC-IU-15T" secondAttribute="bottom" id="mEI-1e-vau"/>
                             <constraint firstItem="O8c-i6-bel" firstAttribute="centerX" secondItem="IDJ-pM-mBv" secondAttribute="centerX" id="pZ6-mX-UL7"/>
                             <constraint firstItem="ewG-uO-fKG" firstAttribute="trailing" secondItem="fgf-o5-dhr" secondAttribute="trailing" id="uQp-Tc-O6x"/>
                         </constraints>
@@ -399,7 +392,6 @@
                     <connections>
                         <outlet property="indicator" destination="O8c-i6-bel" id="6rm-xg-KEp"/>
                         <outlet property="resultsTableView" destination="fgf-o5-dhr" id="wRn-HC-jki"/>
-                        <outlet property="searchBar" destination="9FC-IU-15T" id="Sng-oG-GNY"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="V35-3g-2xb" userLabel="First Responder" sceneMemberID="firstResponder"/>

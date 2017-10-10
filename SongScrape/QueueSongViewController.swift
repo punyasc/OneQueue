@@ -13,44 +13,14 @@ import SpotifyLogin
 
 class QueueSongViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate {
     
+    var sptToken: String?
+    var searchUrl = "https://api.spotify.com/v1/search?q=Kendrick+Lamar&market=US&type=track&limit=3"
+    var names: [String] = []
+    var spotifySongs: [Song] = []
+    var appleSongs: [Song] = []
+    var storefrontId: String?
     var spotifyDoneLoading = true
     var appleDoneLoading = true
-    
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        //later, put in a conditional to check if this is the spotify or apple section
-        if section == 0 {
-            return spotifySongs.count
-        }
-        return appleSongs.count
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "SongCell", for: indexPath)
-        var service: String?
-        let song: Song?
-        if indexPath.section == 0 {
-            //Spotify
-            song = spotifySongs[indexPath.row]
-        } else {
-            //Apple Music
-            song = appleSongs[indexPath.row]
-        }
-        cell.textLabel?.text = song!.title
-        cell.detailTextLabel?.text = song!.artist + " - " + song!.album
-        cell.imageView?.image = song!.artwork
-        return cell
-    }
-    
-    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        if section == 0 {
-            return "Spotify"
-        }
-        return "Apple Music"
-    }
-    
-    func numberOfSections(in tableView: UITableView) -> Int {
-        return 2
-    }
     
     @IBOutlet weak var indicator: UIActivityIndicatorView!
     @IBOutlet weak var resultsTableView: UITableView!
@@ -67,7 +37,7 @@ class QueueSongViewController: UIViewController, UITableViewDelegate, UITableVie
         appleSongs.removeAll()
         updateActivityIndicator()
         
-        let query = searchBar.text
+        let query = navigationItem.searchController?.searchBar.text
         let fixedQuery = query!.replacingOccurrences(of: " ", with: "+", options: .literal, range: nil)
         
         /* Search Spotify */
@@ -100,14 +70,6 @@ class QueueSongViewController: UIViewController, UITableViewDelegate, UITableVie
         }
     }
     
-    
-    var sptToken: String?
-    var searchUrl = "https://api.spotify.com/v1/search?q=Kendrick+Lamar&market=US&type=track&limit=3"
-    var names: [String] = []
-    var spotifySongs: [Song] = []
-    var appleSongs: [Song] = []
-    var storefrontId: String?
-    
     func tableView(_ tableView:UITableView, didSelectRowAt indexPath: IndexPath) {
         
         if (indexPath.section == 0) {
@@ -124,44 +86,35 @@ class QueueSongViewController: UIViewController, UITableViewDelegate, UITableVie
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        //registerForKeyboardNotifications()
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        //callAlamo(url: searchUrl)
-        //print("The token we got here: \(sptToken)")
+        
+        let searchController = UISearchController(searchResultsController: nil)
+        self.navigationItem.searchController = searchController
+        self.navigationItem.hidesSearchBarWhenScrolling = false
+        self.navigationItem.searchController?.searchBar.delegate = self
+        self.navigationItem.searchController?.obscuresBackgroundDuringPresentation = false
+        
         resultsTableView.delegate = self
         resultsTableView.dataSource = self
-        searchBar.delegate = self
-        
         resultsTableView.alpha = 0.0
-        //registerForKeyboardNotifications()
         
-        //let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: "dismissKeyboard")
-        
-        //Uncomment the line below if you want the tap not not interfere and cancel other interactions.
-        //tap.cancelsTouchesInView = false
-        
-        //view.addGestureRecognizer(tap)
         
     }
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        //searchActive = false;
         searchAllServices()
     }
     
     func dismissKeyboard() {
-        //print("********Dismiss*")
-        //Causes the view (or one of its embedded text fields) to resign the first responder status.
-        searchBar.endEditing(true)
+        self.navigationItem.searchController?.searchBar.endEditing(true)
         view.endEditing(true)
     }
     
     func callApple(url: String) {
         Alamofire.request(url).responseJSON(completionHandler: { response in
-            //print("JSON response:")
             let j = JSON(data: response.data!)
             print("QueueSongVC: Apple//")
             print(j)
@@ -177,17 +130,12 @@ class QueueSongViewController: UIViewController, UITableViewDelegate, UITableVie
                 let hdImageUrl = artworkUrl.replacingOccurrences(of: "/100x100bb.jpg", with: "/640x640bb.jpg")
                 let duration = item["trackTimeMillis"].doubleValue
                 guard let data = NSData(contentsOf: URL(string: newArtworkUrl)!)  else {
-                    //print("Could not get data")
                     return
                 }
                 let artwork = UIImage(data: data as Data)
                 let thisSong = Song(title: songTitle, artist: artist, album: album,  artwork: artwork, service: .applemusic, spotifyUri: nil, duration: duration, appleId: trackId, hdImageUrl: hdImageUrl)
                 self.appleSongs.append(thisSong)
-                //self.resultsTableView.reloadData()
             }
-            //let track = j["results"].arrayValue[0]
-            //let trackName = track["trackName"].stringValue
-            //let trackId = track["trackId"].stringValue
             self.appleDoneLoading = true
             self.updateActivityIndicator()
             self.resultsTableView.reloadData()
@@ -256,7 +204,10 @@ class QueueSongViewController: UIViewController, UITableViewDelegate, UITableVie
         if let presenter = presentingViewController as? PlayerTableViewController {
             presenter.queue.append(songToSend)
         }
+        //self.navigationController?.popViewController(animated: true)
+        dismiss(animated: false, completion: nil)
         dismiss(animated: true, completion: nil)
+        //dismiss(animated: true, completion: nil)
     }
     
     /* KEYBOARD DISMISSAL */
@@ -294,6 +245,42 @@ class QueueSongViewController: UIViewController, UITableViewDelegate, UITableVie
         let contentInsets = UIEdgeInsets.zero
         resultsTableView.contentInset = contentInsets
         resultsTableView.scrollIndicatorInsets = contentInsets
+    }
+    
+    // Table Data Source
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if section == 0 {
+            return spotifySongs.count
+        }
+        return appleSongs.count
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "SongCell", for: indexPath)
+        let song: Song?
+        if indexPath.section == 0 {
+            //Spotify
+            song = spotifySongs[indexPath.row]
+        } else {
+            //Apple Music
+            song = appleSongs[indexPath.row]
+        }
+        cell.textLabel?.text = song!.title
+        cell.detailTextLabel?.text = song!.artist + " - " + song!.album
+        cell.imageView?.image = song!.artwork
+        return cell
+    }
+    
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        if section == 0 {
+            return "Spotify"
+        }
+        return "Apple Music"
+    }
+    
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return 2
     }
 
 
